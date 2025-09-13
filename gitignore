@@ -1,0 +1,33 @@
+# dependências
+node_modules/
+
+# produção
+dist/
+build/
+
+# arquivos de log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ambiente
+.env
+.env.*.local
+
+# diretórios do editor
+.vscode/
+.idea/
+
+# sistema operacional
+.DS_Store
+Thumbs.db
+
+# arquivos temporários
+*.log
+*.tmp
+*.swp
+
+# cache do vite
+.cache/
+.vite/
