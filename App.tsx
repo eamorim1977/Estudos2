@@ -1056,7 +1056,7 @@ const App: React.FC = () => {
     type TodayContent = StudyContent & { subjectName: string; subjectId: string; type: 'review' | 'new'; };
 
     const [activeView, setActiveView] = useState<ActiveView>('review');
-    const [activeSubject, setActiveSubject] = useState<Subject | null>(null);
+    const [activeSubjectId, setActiveSubjectId] = useState<string | null>(null);
     const [todayContents, setTodayContents] = useState<TodayContent[]>([]);
     const [currentDoseIndex, setCurrentDoseIndex] = useState(0);
     
@@ -1074,6 +1074,10 @@ const App: React.FC = () => {
         children: null as React.ReactNode | null,
     });
     
+    // Derived state: get the active subject object from the main subjects list
+    // This ensures the displayed data is always fresh
+    const activeSubject = subjects.find(s => s.id === activeSubjectId) || null;
+
     // Notification scheduler effect
     useEffect(() => {
         const checkTimeAndNotify = () => {
@@ -1190,8 +1194,8 @@ const App: React.FC = () => {
             delete newReviewedDoses[subjectId];
             return { ...prev, reviewedDosesPerSubject: newReviewedDoses };
         });
-        if(activeSubject?.id === subjectId) {
-            setActiveSubject(null);
+        if(activeSubjectId === subjectId) {
+            setActiveSubjectId(null);
             setActiveView('review');
         }
     };
@@ -1264,7 +1268,6 @@ const App: React.FC = () => {
         });
 
         setSubjects(updatedSubjects);
-        setActiveSubject(updatedSubjects.find(s => s.id === activeSubject.id) || null);
         setIsContentModalOpen(false);
     };
     
@@ -1280,7 +1283,6 @@ const App: React.FC = () => {
             return s;
         });
         setSubjects(updatedSubjects);
-        setActiveSubject(updatedSubjects.find(s => s.id === activeSubject.id) || null);
     };
 
     const handleUpdateContent = (payload: { contentId: string, newText: string, reprocessAsMindMap: boolean }) => {
@@ -1310,14 +1312,13 @@ const App: React.FC = () => {
         });
 
         setSubjects(updatedSubjects);
-        setActiveSubject(updatedSubjects.find(s => s.id === activeSubject.id) || null);
         setEditingContent(null);
     };
 
 
     const selectView = (view: ActiveView, subject: Subject | null = null) => {
         setActiveView(view);
-        setActiveSubject(subject);
+        setActiveSubjectId(subject?.id || null);
         setIsSidebarOpen(false);
     }
     
@@ -1390,7 +1391,7 @@ const App: React.FC = () => {
                 )}
                 <h2 className="px-3 pt-4 pb-2 text-sm font-semibold text-slate-500 uppercase tracking-wider">Matérias</h2>
                 {subjects.map(subject => (
-                     <button key={subject.id} onClick={() => selectView('subject', subject)} className={`w-full text-left px-3 py-2 rounded-md font-medium transition-colors text-sm ${activeView === 'subject' && activeSubject?.id === subject.id ? 'bg-indigo-100 text-indigo-700' : 'text-slate-600 hover:bg-slate-100'}`}>
+                     <button key={subject.id} onClick={() => selectView('subject', subject)} className={`w-full text-left px-3 py-2 rounded-md font-medium transition-colors text-sm ${activeView === 'subject' && activeSubjectId === subject.id ? 'bg-indigo-100 text-indigo-700' : 'text-slate-600 hover:bg-slate-100'}`}>
                         <div className="flex justify-between items-center">
                             <span className="truncate">{subject.name}</span>
                             <span className="ml-2 flex-shrink-0 text-xs font-semibold text-indigo-700 bg-indigo-100/50 px-2 py-0.5 rounded-full">
